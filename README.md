@@ -5,8 +5,8 @@ Bot local em Python para monitorar e-mails acadêmicos, classificar com Gemini e
 ## 1) Requisitos
 
 - Python 3.11+
-- Conta Gmail com IMAP ativo
-- App Password do Google
+- Conta de e-mail com IMAP ativo (Gmail, Outlook, Yahoo ou outro)
+- Senha de acesso IMAP (ou app password, quando o provedor exigir)
 - Chave Gemini API
 
 ## 2) Setup
@@ -20,37 +20,52 @@ python -m src.main --init
 ```
 
 O comando `--init` cria o `.env` de forma interativa para reduzir setup manual.
+Ele pergunta em linguagem amigável e grava as variáveis técnicas (`IMAP_*`) automaticamente.
 
-Se preferir setup manual, copie `.env.example` e ajuste os campos:
+Forma rápida (script único, sem ativar venv manualmente):
 
-- `IMAP_*`: conexão Gmail/IMAP
-- `ALLOWED_DOMAINS`: domínios permitidos separados por vírgula
-- `GEMINI_*`: chave e modelo do Gemini
+```bash
+bash run.sh init
+bash run.sh smoke
+bash run.sh run
+```
+
+Se preferir setup manual, copie `.env.example` para `.env` e ajuste os campos:
+
+- `IMAP_*`: conexão IMAP (host, porta, usuário, senha e mailbox)
+- `ALLOWED_DOMAINS`: domínios permitidos separados por vírgula (ex.: `faculdade.edu.br,universidade.edu.br`)
+- `GEMINI_*`: chave e modelo do Gemini (`gemini-2.5-flash` por padrão)
 - `SQLITE_PATH`: cache local dos e-mails processados
 
 ## 3) Execução
 
-Forma rápida (script único):
+Com `run.sh`:
 
 ```bash
-./run.sh init
-./run.sh smoke
-./run.sh run
+bash run.sh init
+bash run.sh smoke
+bash run.sh run
 ```
 
-Execução normal:
+Se quiser forçar uma versão específica do Python:
+
+```bash
+PYTHON_BIN=python3.11 bash run.sh init
+```
+
+Execução direta com Python:
 
 ```bash
 python -m src.main
 ```
 
-Execução sem marcar como lido (debug):
+Execução sem marcar e-mails como lidos (debug):
 
 ```bash
 python -m src.main --dry-run
 ```
 
-Smoke check de conectividade:
+Smoke check de configuração (IMAP + Gemini):
 
 ```bash
 python -m src.main --smoke-check
@@ -73,7 +88,7 @@ crontab -e
 Exemplo para rodar todos os dias às 18:30:
 
 ```cron
-30 18 * * * /home/fernando/Documents/personal/unex_notifier/.venv/bin/python -m src.main >> /home/fernando/Documents/personal/unex_notifier/.data/cron.log 2>&1
+30 18 * * * /home/fernando/Documents/personal/unex-notifier/.venv/bin/python -m src.main >> /home/fernando/Documents/personal/unex-notifier/.data/cron.log 2>&1
 ```
 
 ## 6) Arquitetura

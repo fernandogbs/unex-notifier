@@ -26,7 +26,6 @@ detect_python() {
 }
 
 VENV_PYTHON="$VENV_DIR/bin/python"
-VENV_PIP="$VENV_DIR/bin/pip"
 
 print_help() {
   cat <<'EOF'
@@ -39,6 +38,9 @@ Usage:
   ./run.sh dry-run      # run pipeline without marking emails as seen
   ./run.sh test         # run unit tests
   ./run.sh help         # show this help
+
+Optional:
+  PYTHON_BIN=python3.11 ./run.sh init
 EOF
 }
 
@@ -58,7 +60,7 @@ ensure_venv() {
 
 install_deps() {
   "$VENV_PYTHON" -m pip install --upgrade pip >/dev/null
-  "$VENV_PIP" install -e ".[dev]" >/dev/null
+  "$VENV_PYTHON" -m pip install -e ".[dev]" >/dev/null
 }
 
 main() {

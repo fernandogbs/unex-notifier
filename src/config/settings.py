@@ -22,7 +22,7 @@ class AppSettings(BaseSettings):
     allowed_domains: str = Field(alias="ALLOWED_DOMAINS")
 
     gemini_api_key: str = Field(alias="GEMINI_API_KEY")
-    gemini_model: str = Field(default="gemini-1.5-flash", alias="GEMINI_MODEL")
+    gemini_model: str = Field(default="gemini-2.5-flash", alias="GEMINI_MODEL")
 
     sqlite_path: Path = Field(default=Path(".data/seen_emails.db"), alias="SQLITE_PATH")
     lookback_hours: int = Field(default=24, alias="LOOKBACK_HOURS")

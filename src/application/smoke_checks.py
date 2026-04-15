@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import imaplib
 import socket
 
 from google import genai
@@ -8,8 +9,23 @@ from src.config.settings import AppSettings
 
 
 def _check_imap(settings: AppSettings) -> str:
-    with socket.create_connection((settings.imap_host, settings.imap_port), timeout=5):
-        return "ok"
+    mailbox = settings.imap_mailbox
+    try:
+        with imaplib.IMAP4_SSL(settings.imap_host, settings.imap_port, timeout=10) as client:
+            client.login(settings.imap_username, settings.imap_app_password)
+            status, _ = client.select(mailbox)
+            if status != "OK":
+                return f"error: mailbox '{mailbox}' nao encontrada"
+            client.logout()
+            return "ok"
+    except imaplib.IMAP4.error:
+        return "error: falha de autenticacao IMAP (usuario/senha)"
+    except TimeoutError:
+        return "error: timeout na conexao IMAP"
+    except socket.gaierror:
+        return "error: host IMAP invalido ou indisponivel"
+    except Exception as error:
+        return f"error: {error}"
 
 
 def _check_gemini(settings: AppSettings) -> str:
@@ -25,12 +41,7 @@ def _check_gemini(settings: AppSettings) -> str:
 
 
 def run_smoke_checks(settings: AppSettings) -> dict[str, str]:
-    results: dict[str, str] = {}
-    try:
-        results["imap"] = _check_imap(settings)
-    except Exception as error:
-        results["imap"] = f"error: {error}"
-
+    results: dict[str, str] = {"imap": _check_imap(settings)}
     try:
         results["gemini"] = _check_gemini(settings)
     except Exception as error:
