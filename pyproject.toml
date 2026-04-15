@@ -1,0 +1,29 @@
+[project]
+name = "unex-notifier"
+version = "0.1.0"
+description = "Email monitor bot with Gemini classification and terminal digest."
+requires-python = ">=3.11"
+dependencies = [
+  "python-dotenv>=1.1.0",
+  "pydantic>=2.11.0",
+  "pydantic-settings>=2.10.0",
+  "google-genai>=0.3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3.0",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+namespaces = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
