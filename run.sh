@@ -4,7 +4,29 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_DIR="$ROOT_DIR/.venv"
-PYTHON_BIN="${PYTHON_BIN:-python3}"
+
+detect_python() {
+  if [[ -n "${PYTHON_BIN:-}" ]]; then
+    echo "$PYTHON_BIN"
+    return 0
+  fi
+
+  if command -v python3 >/dev/null 2>&1; then
+    echo "python3"
+    return 0
+  fi
+
+  if command -v python >/dev/null 2>&1; then
+    echo "python"
+    return 0
+  fi
+
+  echo "Python interpreter not found (python3/python)." >&2
+  exit 1
+}
+
+VENV_PYTHON="$VENV_DIR/bin/python"
+VENV_PIP="$VENV_DIR/bin/pip"
 
 print_help() {
   cat <<'EOF'
@@ -21,16 +43,22 @@ EOF
 }
 
 ensure_venv() {
+  local base_python
+  base_python="$(detect_python)"
+
   if [[ ! -d "$VENV_DIR" ]]; then
-    "$PYTHON_BIN" -m venv "$VENV_DIR"
+    "$base_python" -m venv "$VENV_DIR"
   fi
-  # shellcheck disable=SC1091
-  source "$VENV_DIR/bin/activate"
+
+  if [[ ! -x "$VENV_PYTHON" ]]; then
+    echo "Virtualenv python not found at $VENV_PYTHON" >&2
+    exit 1
+  fi
 }
 
 install_deps() {
-  python -m pip install --upgrade pip >/dev/null
-  pip install -e ".[dev]" >/dev/null
+  "$VENV_PYTHON" -m pip install --upgrade pip >/dev/null
+  "$VENV_PIP" install -e ".[dev]" >/dev/null
 }
 
 main() {
@@ -41,27 +69,27 @@ main() {
     init)
       ensure_venv
       install_deps
-      python -m src.main --init
+      "$VENV_PYTHON" -m src.main --init
       ;;
     smoke)
       ensure_venv
       install_deps
-      python -m src.main --smoke-check
+      "$VENV_PYTHON" -m src.main --smoke-check
       ;;
     run)
       ensure_venv
       install_deps
-      python -m src.main
+      "$VENV_PYTHON" -m src.main
       ;;
     dry-run)
       ensure_venv
       install_deps
-      python -m src.main --dry-run
+      "$VENV_PYTHON" -m src.main --dry-run
       ;;
     test)
       ensure_venv
       install_deps
-      pytest
+      "$VENV_PYTHON" -m pytest
       ;;
     help|--help|-h)
       print_help
