@@ -14,7 +14,8 @@ Bot local em Python para monitorar e-mails acadêmicos, classificar com Gemini e
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev]"
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
 python -m src.main --init
 ```
 
