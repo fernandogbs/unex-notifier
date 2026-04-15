@@ -88,7 +88,7 @@ crontab -e
 Exemplo para rodar todos os dias às 18:30:
 
 ```cron
-30 18 * * * /home/fernando/Documents/personal/unex-notifier/.venv/bin/python -m src.main >> /home/fernando/Documents/personal/unex-notifier/.data/cron.log 2>&1
+30 18 * * * unex-notifier/.venv/bin/python -m src.main >> unex-notifier/.data/cron.log 2>&1
 ```
 
 ## 6) Arquitetura
